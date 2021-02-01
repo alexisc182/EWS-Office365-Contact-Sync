@@ -17,6 +17,7 @@ Utilizes both Exchange Web Services and Office 365 Remote PowerShell Services to
 3. Export your Office 365 administrator credentials to a CliXml credential file. See below for an example on how to do this.
 ```
 $Credxmlpath = "C:\MyCredentials\"
+$Credential = Get-Credential
 $Credential | Export-Clixml $Credxmlpath
 ```
 4. You may need to unblock the included .dll files. To do this, navigate to EWSContacts\Module\bin -> For each .dll file, right click on the file -> Check 'Unblock'
