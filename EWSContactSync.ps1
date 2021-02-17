@@ -35,6 +35,9 @@ Optional Switch; Don't sync contacts that are a shared mailbox, or are a mailbox
 .PARAMETER IncludeNonUserContacts
 Optional Switch; Also sync contacts that aren't users/mailboxes in your directory. These contacts must still have an email address.
 
+.PARAMETER DomainSync
+Specify @domain.com. To sync only contacts for that domain, Anything else will be skipped.
+
 .EXAMPLE
 
 Command Prompt
@@ -44,7 +47,8 @@ C:\> PowerShell.exe -ExecutionPolicy Bypass ^
 -CredentialPath "%CD%\Tools\SecureCredential.cred" ^
 -FolderName "My Contact Folder" ^
 -LogPath "%CD%\Logs\%mydate%_%mytime%.log" ^
--MailboxList "testemail@mycompany.com"
+-MailboxList "testemail@mycompany.com" ^
+-DomainSync "@mycompany.com"
 
 .LINK
 
@@ -86,7 +90,12 @@ Param (
     $ExcludeSharedMailboxContacts,
     
     [Parameter(Mandatory=$false)]
-    [Switch]$IncludeNonUserContacts
+    [Switch]
+    $IncludeNonUserContacts,
+    
+    [Parameter(Mandatory=$True)]
+    [String]
+    $DomainSync
 )
 
 #---------------------------------------------------------[Initialisations]--------------------------------------------------------
@@ -118,7 +127,7 @@ if ($MailboxList -eq "DIRECTORY") {
 
 foreach ($Mailbox in $MailboxList) {
     try {
-        Sync-ContactList -Mailbox $Mailbox -Credential $Credential -FolderName $FolderName -ContactList $GALContacts -ClientID $ClientID -ModernAuth $ModernAuth
+        Sync-ContactList -Mailbox $Mailbox -Credential $Credential -FolderName $FolderName -ContactList $GALContacts -ClientID $ClientID -ModernAuth $ModernAuth -DomainSync $DomainSync
     } catch {
         Write-Log -Level "ERROR" -Message "Failed to Sync-ContactList for $Mailbox" -exception $_.Exception.Message
     }
