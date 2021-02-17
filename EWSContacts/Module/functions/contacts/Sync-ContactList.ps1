@@ -88,7 +88,7 @@ process {
 	# NOTE: This cannot yet remove contacts with no email address!
 	try {
 		foreach ($Contact in $MailboxContactsToBeDeleted) {
-			if ($Contact.EmailAddresses -like '*'+ $DomainSync) {
+			if ($($Contact.EmailAddresses[[Microsoft.Exchange.WebServices.Data.EmailAddressKey]::EmailAddress1].Address.ToLower()) -like '*'+ $DomainSync) {
 				Write-Log -Message "Deleting Contact: $($Contact.EmailAddresses[[Microsoft.Exchange.WebServices.Data.EmailAddressKey]::EmailAddress1].Address.ToLower())"
 				$Contact.Delete([Microsoft.Exchange.WebServices.Data.DeleteMode]::SoftDelete)
 			} else {
