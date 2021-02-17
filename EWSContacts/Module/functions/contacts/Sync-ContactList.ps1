@@ -47,7 +47,10 @@ param (
 	$FolderName,
 
 	[Parameter(Position = 5, Mandatory = $true)]
-	$ContactList
+	$ContactList,
+	
+	[Parameter(Position = 6, Mandatory = $true)]
+	$DomainSync
 )
 process {
 	Write-Log -Message "Beginning contact sync for $($Mailbox)'s mailbox"
@@ -85,8 +88,13 @@ process {
 	# NOTE: This cannot yet remove contacts with no email address!
 	try {
 		foreach ($Contact in $MailboxContactsToBeDeleted) {
-			Write-Log -Message "Deleting Contact: $($Contact.EmailAddresses[[Microsoft.Exchange.WebServices.Data.EmailAddressKey]::EmailAddress1].Address.ToLower())"
-			$Contact.Delete([Microsoft.Exchange.WebServices.Data.DeleteMode]::SoftDelete)
+			if ($Contact.EmailAddresses -like '*'+ $DomainSync) {
+				Write-Log -Message "Deleting Contact: $($Contact.EmailAddresses[[Microsoft.Exchange.WebServices.Data.EmailAddressKey]::EmailAddress1].Address.ToLower())"
+				$Contact.Delete([Microsoft.Exchange.WebServices.Data.DeleteMode]::SoftDelete)
+			} else {
+                		Write-Log -Message "Skip Delete, not $DomainSync contact: $($Contact.EmailAddresses[[Microsoft.Exchange.WebServices.Data.EmailAddressKey]::EmailAddress1].Address.ToLower())"
+            		}
+	    }
 		}
 	} catch {
 		Write-Log -Level "ERROR" -Message "Failed to remove all obsolete contacts from $($Mailbox)'s mailbox" -exception $_.Exception.Message
